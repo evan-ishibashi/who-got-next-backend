@@ -1,8 +1,8 @@
 "use strict";
 
-const db = require("../db");
+import {db} from "../db";
 const bcrypt = require("bcrypt");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+// const { sqlForPartialUpdate } = require("../helpers/sql");
 const {
   NotFoundError,
   BadRequestError,

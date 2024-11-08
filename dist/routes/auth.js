@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonschema = require("jsonschema");
-const User = require("../models/user");
+const User = require("../models/player");
 const express = require("express");
 const router = new express.Router();
 const { createToken } = require("../helpers/tokens");
