@@ -1,4 +1,3 @@
-require("./interface")
 /** ExpressError extends normal JS error so we can
  *  add a status when we make an instance of it.
  *
@@ -6,9 +5,9 @@ require("./interface")
  */
 
 class ExpressError extends Error {
+  status: number;
   constructor(message:string, status:number) {
-    super();
-    this.message = message;
+    super(message);
     this.status = status;
   }
 }

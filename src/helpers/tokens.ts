@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
-import '../interface';
+import '../types/interface';
 
 /** return signed JWT {username, isAdmin} from user data. */
 
@@ -10,7 +10,6 @@ function createToken(player:Player) {
 
   let payload = {
     username: player.username,
-    isAdmin: player.isAdmin || false,
   };
 
   return jwt.sign(payload, SECRET_KEY);

@@ -1,3 +1,14 @@
+
+CREATE TABLE players (
+  username VARCHAR(25) PRIMARY KEY,
+  password TEXT NOT NULL,
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL,
+  email TEXT NOT NULL
+    CHECK (position('@' IN email) > 1),
+  photo_url TEXT
+);
+
 -- CREATE TABLE leagues (
 --   id SERIAL PRIMARY KEY,
 --   name TEXT UNIQUE NOT NULL,
@@ -7,16 +18,6 @@
 --   owner VARCHAR(25) NOT NULL
 --     REFERENCES players ON DELETE CASCADE
 -- );
-
-CREATE TABLE players (
-  username VARCHAR(25) PRIMARY KEY,
-  password TEXT NOT NULL,
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  email TEXT NOT NULL
-    CHECK (position('@' IN email) > 1),
-  photo_url TEXT,
-);
 
 -- CREATE TABLE games (
 --   id SERIAL PRIMARY KEY,

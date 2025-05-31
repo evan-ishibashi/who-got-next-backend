@@ -1,7 +1,3 @@
-interface Error {
-  status?: number;
-}
-
 interface Player {
   username: string,
   firstName: string,

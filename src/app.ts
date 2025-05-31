@@ -1,7 +1,7 @@
 const express = require("express");
 import {Request, Response} from 'express';
 const cors = require("cors");
-require("./interface")
+import { ExpressError } from './expressError'
 
 const { NotFoundError } = require("./expressError");
 
@@ -32,7 +32,7 @@ app.use(function () {
 });
 
 /** Generic error handler; anything unhandled goes here. */
-app.use(function (err:Error, res:Response) {
+app.use(function (err:ExpressError, res:Response) {
   if (process.env.NODE_ENV !== "test") console.error(err.stack);
   const status = err.status || 500;
   const message = err.message;
