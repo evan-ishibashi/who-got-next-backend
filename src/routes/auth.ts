@@ -2,7 +2,7 @@
 
 const jsonschema = require("jsonschema");
 
-const User = require("../models/player");
+const Player = require("../models/player");
 const express = require("express");
 const router = new express.Router();
 const { createToken } = require("../helpers/tokens");
@@ -30,7 +30,7 @@ router.post("/token", async function (req:Request, res:Response) {
   }
 
   const { username, password } = req.body;
-  const user = await User.authenticate(username, password);
+  const user = await Player.authenticate(username, password);
   const token = createToken(user);
   return res.json({ token });
 });
@@ -56,7 +56,7 @@ router.post("/register", async function (req:Request, res:Response) {
     throw new BadRequestError(errs);
   }
 
-  const newUser = await User.register({ ...req.body, isAdmin: false });
+  const newUser = await Player.register({ ...req.body, isAdmin: false });
   const token = createToken(newUser);
   return res.status(201).json({ token });
 });

@@ -28,6 +28,11 @@
         "minLength": 6,
         "maxLength": 60,
         "format": "email"
+      },
+      "photoUrl": {
+        "type": "string",
+        "minLength": 6,
+        "maxLength": 60
       }
     },
     "additionalProperties": false,

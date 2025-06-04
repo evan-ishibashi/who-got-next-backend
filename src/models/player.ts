@@ -13,7 +13,7 @@ const { BCRYPT_WORK_FACTOR } = require("../config.ts");
 
 /** Related functions for users. */
 
-class User {
+class Player {
   /** authenticate user with username, password.
    *
    * Returns { username, first_name, last_name, email, is_admin }
@@ -29,7 +29,7 @@ class User {
                first_name AS "firstName",
                last_name  AS "lastName",
                email,
-               is_admin   AS "isAdmin"
+               photo_url   AS "photoURL"
         FROM users
         WHERE username = $1`, [username],
     );
@@ -48,7 +48,7 @@ class User {
     throw new UnauthorizedError("Invalid username/password");
   }
 
-  /** Register user with data.
+  /** Register player with data.
    *
    * Returns { username, firstName, lastName, email, isAdmin }
    *
@@ -56,14 +56,14 @@ class User {
    **/
 
   static async register(
-    { username, password, firstName, lastName, email, isAdmin }:
+    { username, password, firstName, lastName, email, photo_url="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" }:
       {
         username: string, password: string, firstName: string, lastName: string,
-        email: string, isAdmin: boolean;
+        email: string, photo_url: string;
       }) {
     const duplicateCheck = await db.query(`
         SELECT username
-        FROM users
+        FROM players
         WHERE username = $1`, [username],
     );
 
@@ -74,35 +74,35 @@ class User {
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
     const result = await db.query(`
-                INSERT INTO users
+                INSERT INTO players
                 (username,
                  password,
                  first_name,
                  last_name,
                  email,
-                 is_admin)
+                 photo_url)
                 VALUES ($1, $2, $3, $4, $5, $6)
                 RETURNING
                     username,
                     first_name AS "firstName",
                     last_name AS "lastName",
                     email,
-                    is_admin AS "isAdmin"`, [
+                    photo_url AS "photoUrl"`, [
       username,
       hashedPassword,
       firstName,
       lastName,
       email,
-      isAdmin,
+      photo_url,
     ],
     );
 
-    const user = result.rows[0];
+    const player = result.rows[0];
 
-    return user;
+    return player;
   }
 
-  /** Find all users.
+  /** Find all players.
    *
    * Returns [{ username, first_name, last_name, email, is_admin }, ...]
    **/
@@ -114,7 +114,7 @@ class User {
                last_name  AS "lastName",
                email,
                is_admin   AS "isAdmin"
-        FROM users
+        FROM players
         ORDER BY username`,
     );
 
@@ -130,19 +130,19 @@ class User {
    **/
 
   static async get(username:string) {
-    const userRes = await db.query(`
+    const playerRes = await db.query(`
         SELECT username,
                first_name AS "firstName",
                last_name  AS "lastName",
                email,
                is_admin   AS "isAdmin"
-        FROM users
+        FROM players
         WHERE username = $1`, [username],
     );
 
-    const user = userRes.rows[0];
+    const player = playerRes.rows[0];
 
-    if (!user) throw new NotFoundError(`No user: ${username}`);
+    if (!player) throw new NotFoundError(`No user: ${username}`);
 
     // const userApplicationsRes = await db.query(`
     //     SELECT a.job_id
@@ -150,7 +150,7 @@ class User {
     //     WHERE a.username = $1`, [username]);
 
     // user.applications = userApplicationsRes.rows.map(a => a.job_id);
-    return user;
+    return player;
   }
 
   /** Update user data with `data`.
@@ -246,4 +246,4 @@ class User {
 }
 
 
-module.exports = User;
+module.exports = Player;
