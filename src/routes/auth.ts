@@ -62,19 +62,5 @@ router.post("/register", async function (req:Request, res:Response) {
   return res.status(201).json({ token });
 });
 
-/** GET /auth/test:  Test endpoint to verify authentication
- *
- * Returns user info if authenticated
- *
- * Authorization required: login
- */
-
-router.get("/test", ensureLoggedIn, async function (req:Request, res:Response) {
-  return res.json({
-    message: "Authentication successful!",
-    user: res.locals.user
-  });
-});
-
 
 module.exports = router;
