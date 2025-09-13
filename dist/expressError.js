@@ -1,16 +1,14 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ForbiddenError = exports.BadRequestError = exports.UnauthorizedError = exports.NotFoundError = exports.ExpressError = void 0;
-require("./interface");
 /** ExpressError extends normal JS error so we can
  *  add a status when we make an instance of it.
  *
  *  The error-handling middleware will return this.
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ForbiddenError = exports.BadRequestError = exports.UnauthorizedError = exports.NotFoundError = exports.ExpressError = void 0;
 class ExpressError extends Error {
     constructor(message, status) {
-        super();
-        this.message = message;
+        super(message);
         this.status = status;
     }
 }

@@ -13,9 +13,9 @@ const db_1 = require("../db");
 const bcrypt = require("bcrypt");
 // const { sqlForPartialUpdate } = require("../helpers/sql");
 const { NotFoundError, BadRequestError, UnauthorizedError, } = require("../expressError");
-const { BCRYPT_WORK_FACTOR } = require("../config.js");
+const { BCRYPT_WORK_FACTOR } = require("../config");
 /** Related functions for users. */
-class User {
+class Player {
     /** authenticate user with username, password.
      *
      * Returns { username, first_name, last_name, email, is_admin }
@@ -31,8 +31,8 @@ class User {
                first_name AS "firstName",
                last_name  AS "lastName",
                email,
-               is_admin   AS "isAdmin"
-        FROM users
+               photo_url   AS "photoURL"
+        FROM players
         WHERE username = $1`, [username]);
             const user = result.rows[0];
             if (user) {
@@ -46,49 +46,52 @@ class User {
             throw new UnauthorizedError("Invalid username/password");
         });
     }
-    /** Register user with data.
+    /** Register player with data.
      *
      * Returns { username, firstName, lastName, email, isAdmin }
      *
      * Throws BadRequestError on duplicates.
      **/
     static register(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ username, password, firstName, lastName, email, isAdmin }) {
+        return __awaiter(this, arguments, void 0, function* ({ username, password, firstName, lastName, email, photo_url = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png", isAdmin = false }) {
             const duplicateCheck = yield db_1.db.query(`
         SELECT username
-        FROM users
+        FROM players
         WHERE username = $1`, [username]);
             if (duplicateCheck.rows.length > 0) {
                 throw new BadRequestError(`Duplicate username: ${username}`);
             }
             const hashedPassword = yield bcrypt.hash(password, BCRYPT_WORK_FACTOR);
             const result = yield db_1.db.query(`
-                INSERT INTO users
+                INSERT INTO players
                 (username,
                  password,
                  first_name,
                  last_name,
                  email,
+                 photo_url,
                  is_admin)
-                VALUES ($1, $2, $3, $4, $5, $6)
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
                 RETURNING
                     username,
                     first_name AS "firstName",
                     last_name AS "lastName",
                     email,
+                    photo_url AS "photoUrl",
                     is_admin AS "isAdmin"`, [
                 username,
                 hashedPassword,
                 firstName,
                 lastName,
                 email,
+                photo_url,
                 isAdmin,
             ]);
-            const user = result.rows[0];
-            return user;
+            const player = result.rows[0];
+            return player;
         });
     }
-    /** Find all users.
+    /** Find all players.
      *
      * Returns [{ username, first_name, last_name, email, is_admin }, ...]
      **/
@@ -100,7 +103,7 @@ class User {
                last_name  AS "lastName",
                email,
                is_admin   AS "isAdmin"
-        FROM users
+        FROM players
         ORDER BY username`);
             return result.rows;
         });
@@ -114,23 +117,23 @@ class User {
      **/
     static get(username) {
         return __awaiter(this, void 0, void 0, function* () {
-            const userRes = yield db_1.db.query(`
+            const playerRes = yield db_1.db.query(`
         SELECT username,
                first_name AS "firstName",
                last_name  AS "lastName",
                email,
                is_admin   AS "isAdmin"
-        FROM users
+        FROM players
         WHERE username = $1`, [username]);
-            const user = userRes.rows[0];
-            if (!user)
+            const player = playerRes.rows[0];
+            if (!player)
                 throw new NotFoundError(`No user: ${username}`);
             // const userApplicationsRes = await db.query(`
             //     SELECT a.job_id
             //     FROM applications AS a
             //     WHERE a.username = $1`, [username]);
             // user.applications = userApplicationsRes.rows.map(a => a.job_id);
-            return user;
+            return player;
         });
     }
     /** Update user data with `data`.
@@ -181,7 +184,7 @@ class User {
         return __awaiter(this, void 0, void 0, function* () {
             let result = yield db_1.db.query(`
         DELETE
-        FROM users
+        FROM players
         WHERE username = $1
         RETURNING username`, [username]);
             const user = result.rows[0];
@@ -190,4 +193,4 @@ class User {
         });
     }
 }
-module.exports = User;
+module.exports = Player;

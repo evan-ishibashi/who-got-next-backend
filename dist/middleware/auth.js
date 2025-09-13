@@ -33,7 +33,7 @@ function authenticateJWT(req, res, next) {
  *
  * If not, raises Unauthorized.
  */
-function ensureLoggedIn(res, next) {
+function ensureLoggedIn(req, res, next) {
     var _a;
     if ((_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.username)
         return next();
@@ -43,7 +43,7 @@ function ensureLoggedIn(res, next) {
  *
  *  If not, raises Unauthorized.
  */
-function ensureAdmin(res, next) {
+function ensureAdmin(req, res, next) {
     var _a, _b;
     if (((_a = res.locals.user) === null || _a === void 0 ? void 0 : _a.username) && ((_b = res.locals.user) === null || _b === void 0 ? void 0 : _b.isAdmin) === true) {
         return next();

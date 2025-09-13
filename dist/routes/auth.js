@@ -11,13 +11,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonschema = require("jsonschema");
-const User = require("../models/player");
+const Player = require("../models/player");
 const express = require("express");
 const router = new express.Router();
 const { createToken } = require("../helpers/tokens");
 const userAuthSchema = require("../schemas/userAuth.json");
 const userRegisterSchema = require("../schemas/userRegister.json");
 const expressError_1 = require("../expressError");
+const { ensureLoggedIn } = require("../middleware/auth");
 /** POST /auth/token:  { username, password } => { token }
  *
  * Returns JWT token which can be used to authenticate further requests.
@@ -32,7 +33,7 @@ router.post("/token", function (req, res) {
             throw new expressError_1.BadRequestError(errs);
         }
         const { username, password } = req.body;
-        const user = yield User.authenticate(username, password);
+        const user = yield Player.authenticate(username, password);
         const token = createToken(user);
         return res.json({ token });
     });
@@ -52,9 +53,23 @@ router.post("/register", function (req, res) {
             const errs = validator.errors.map((e) => e.stack);
             throw new expressError_1.BadRequestError(errs);
         }
-        const newUser = yield User.register(Object.assign(Object.assign({}, req.body), { isAdmin: false }));
+        const newUser = yield Player.register(Object.assign(Object.assign({}, req.body), { isAdmin: false }));
         const token = createToken(newUser);
         return res.status(201).json({ token });
+    });
+});
+/** GET /auth/test:  Test endpoint to verify authentication
+ *
+ * Returns user info if authenticated
+ *
+ * Authorization required: login
+ */
+router.get("/test", ensureLoggedIn, function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return res.json({
+            message: "Authentication successful!",
+            user: res.locals.user
+        });
     });
 });
 module.exports = router;

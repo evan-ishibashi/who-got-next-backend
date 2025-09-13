@@ -10,6 +10,7 @@ const userAuthSchema = require("../schemas/userAuth.json");
 const userRegisterSchema = require("../schemas/userRegister.json");
 import {Request, Response} from 'express';
 import { BadRequestError } from "../expressError";
+const { ensureLoggedIn } = require("../middleware/auth");
 
 /** POST /auth/token:  { username, password } => { token }
  *
@@ -59,6 +60,20 @@ router.post("/register", async function (req:Request, res:Response) {
   const newUser = await Player.register({ ...req.body, isAdmin: false });
   const token = createToken(newUser);
   return res.status(201).json({ token });
+});
+
+/** GET /auth/test:  Test endpoint to verify authentication
+ *
+ * Returns user info if authenticated
+ *
+ * Authorization required: login
+ */
+
+router.get("/test", ensureLoggedIn, async function (req:Request, res:Response) {
+  return res.json({
+    message: "Authentication successful!",
+    user: res.locals.user
+  });
 });
 
 

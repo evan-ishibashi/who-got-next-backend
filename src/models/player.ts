@@ -9,7 +9,7 @@ const {
   UnauthorizedError,
 } = require("../expressError");
 
-const { BCRYPT_WORK_FACTOR } = require("../config.ts");
+const { BCRYPT_WORK_FACTOR } = require("../config");
 
 /** Related functions for users. */
 
@@ -30,7 +30,7 @@ class Player {
                last_name  AS "lastName",
                email,
                photo_url   AS "photoURL"
-        FROM users
+        FROM players
         WHERE username = $1`, [username],
     );
 
@@ -56,10 +56,10 @@ class Player {
    **/
 
   static async register(
-    { username, password, firstName, lastName, email, photo_url="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" }:
+    { username, password, firstName, lastName, email, photo_url="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png", isAdmin=false }:
       {
         username: string, password: string, firstName: string, lastName: string,
-        email: string, photo_url: string;
+        email: string, photo_url: string, isAdmin: boolean;
       }) {
     const duplicateCheck = await db.query(`
         SELECT username
@@ -80,20 +80,23 @@ class Player {
                  first_name,
                  last_name,
                  email,
-                 photo_url)
-                VALUES ($1, $2, $3, $4, $5, $6)
+                 photo_url,
+                 is_admin)
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
                 RETURNING
                     username,
                     first_name AS "firstName",
                     last_name AS "lastName",
                     email,
-                    photo_url AS "photoUrl"`, [
+                    photo_url AS "photoUrl",
+                    is_admin AS "isAdmin"`, [
       username,
       hashedPassword,
       firstName,
       lastName,
       email,
       photo_url,
+      isAdmin,
     ],
     );
 
@@ -207,7 +210,7 @@ class Player {
   static async remove(username:string) {
     let result = await db.query(`
         DELETE
-        FROM users
+        FROM players
         WHERE username = $1
         RETURNING username`, [username],
     );
